@@ -18,10 +18,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.taskmanager.ui.addtask.AddTaskScreen
 import com.taskmanager.ui.addtask.AddTaskViewModel
+import com.taskmanager.ui.addtask.AddTaskViewModelFactory
 import com.taskmanager.ui.home.HomeScreen
 import com.taskmanager.ui.home.HomeViewModel
+import com.taskmanager.ui.home.HomeViewModelFactory
 import com.taskmanager.ui.taskdetail.TaskDetailScreen
 import com.taskmanager.ui.taskdetail.TaskDetailViewModel
+import com.taskmanager.ui.taskdetail.TaskDetailViewModelFactory
 import com.taskmanager.ui.theme.TaskManagerTheme
 
 class MainActivity : ComponentActivity() {
