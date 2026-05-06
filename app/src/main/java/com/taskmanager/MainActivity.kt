@@ -11,6 +11,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -77,6 +92,7 @@ class MainActivity : ComponentActivity() {
 fun TaskManagerApp() {
     val navController = rememberNavController()
     val application = androidx.compose.ui.platform.LocalContext.current.applicationContext as TaskManagerApplication
+    NotificationPermissionRequester()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -221,5 +237,38 @@ fun TaskManagerApp() {
                 TimetableScreen(viewModel = viewModel)
             }
         }
+    }
+}
+
+@Composable
+fun NotificationPermissionRequester() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+
+    val context = LocalContext.current
+    val permission = Manifest.permission.POST_NOTIFICATIONS
+    val hasPermission = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+    var showDialog by remember { mutableStateOf(!hasPermission) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        showDialog = false
+    }
+
+    LaunchedEffect(hasPermission) {
+        if (hasPermission) showDialog = false
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Enable notifications") },
+            text = { Text("Allow Task Manager to send reminders and notifications.") },
+            confirmButton = {
+                TextButton(onClick = { launcher.launch(permission) }) { Text("Allow") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Later") }
+            }
+        )
     }
 }

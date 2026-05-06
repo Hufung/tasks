@@ -22,21 +22,21 @@ class AlarmScheduler(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    reminderTime,
-                    pendingIntent
-                )
-            }
-        } else {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                reminderTime,
-                pendingIntent
-            )
+        // If the reminder time is in the past or very near, trigger immediately to avoid missed/delayed alarms
+        val now = System.currentTimeMillis()
+        if (reminderTime <= now + 5000) {
+            // Fire the broadcast immediately
+            pendingIntent.send()
+            return
         }
+
+        // Use exact alarm; on newer Android versions the system may still defer if app lacks exact-alarm privileges,
+        // but calling setExactAndAllowWhileIdle gives the best chance to run at the requested time.
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            reminderTime,
+            pendingIntent
+        )
     }
 
     fun cancelReminder(taskId: Long) {

@@ -6,6 +6,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationCompat
 import com.taskmanager.MainActivity
 import com.taskmanager.R
@@ -39,6 +43,16 @@ class NotificationHelper(private val context: Context) {
     }
 
     fun showTaskReminder(taskId: Long, taskTitle: String, taskDescription: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                Log.w("NotificationHelper", "POST_NOTIFICATIONS permission not granted — skipping notification")
+                return
+            }
+        }
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("TASK_ID", taskId)
