@@ -23,6 +23,7 @@ fun AddTaskScreen(
     viewModel: AddTaskViewModel,
     onNavigateBack: () -> Unit,
     taskId: Long? = null,
+    prefilledDueDate: Long? = null,
     modifier: Modifier = Modifier
 ) {
     val title by viewModel.title.collectAsState()
@@ -44,6 +45,12 @@ fun AddTaskScreen(
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTask(it) }
+    }
+
+    LaunchedEffect(prefilledDueDate) {
+        if (taskId == null && prefilledDueDate != null) {
+            viewModel.setDueDate(prefilledDueDate)
+        }
     }
 
     Scaffold(

@@ -27,6 +27,14 @@ class TaskRepository(
         return tagDao.getAllTags()
     }
 
+    fun getTasksByDateRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TaskWithDetails>> {
+        return taskDao.getTasksByDateRange(startTimestamp, endTimestamp)
+    }
+
+    fun getTasksForMonth(startOfMonth: Long, endOfMonth: Long): Flow<List<TaskWithDetails>> {
+        return taskDao.getTasksForMonth(startOfMonth, endOfMonth)
+    }
+
     suspend fun insertTask(
         task: Task,
         subtasks: List<Subtask>,

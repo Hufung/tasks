@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.taskmanager.data.database.dao.EventScheduleCacheDao
 import com.taskmanager.data.database.dao.SubtaskDao
 import com.taskmanager.data.database.dao.TagDao
 import com.taskmanager.data.database.dao.TaskDao
@@ -15,9 +16,10 @@ import com.taskmanager.data.database.entities.*
         Task::class,
         Subtask::class,
         Tag::class,
-        TaskTagCrossRef::class
+        TaskTagCrossRef::class,
+        EventScheduleCache::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -25,6 +27,7 @@ abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun subtaskDao(): SubtaskDao
     abstract fun tagDao(): TagDao
+    abstract fun eventScheduleCacheDao(): EventScheduleCacheDao
 
     companion object {
         @Volatile

@@ -30,6 +30,14 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE dueDate IS NOT NULL AND dueDate <= :timestamp ORDER BY dueDate ASC")
     fun getTasksDueBefore(timestamp: Long): Flow<List<Task>>
 
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE dueDate IS NOT NULL AND dueDate >= :startTimestamp AND dueDate < :endTimestamp ORDER BY dueDate ASC")
+    fun getTasksByDateRange(startTimestamp: Long, endTimestamp: Long): Flow<List<TaskWithDetails>>
+
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE dueDate IS NOT NULL AND dueDate >= :startOfMonth AND dueDate < :endOfMonth ORDER BY dueDate ASC")
+    fun getTasksForMonth(startOfMonth: Long, endOfMonth: Long): Flow<List<TaskWithDetails>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task): Long
 
