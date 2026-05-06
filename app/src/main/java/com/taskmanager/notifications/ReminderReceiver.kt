@@ -19,7 +19,8 @@ class ReminderReceiver : BroadcastReceiver() {
             val repository = TaskRepository(
                 database.taskDao(),
                 database.subtaskDao(),
-                database.tagDao()
+                database.tagDao(),
+                context
             )
 
             CoroutineScope(Dispatchers.IO).launch {

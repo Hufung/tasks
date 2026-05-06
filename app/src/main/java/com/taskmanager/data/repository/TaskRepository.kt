@@ -1,16 +1,20 @@
 package com.taskmanager.data.repository
 
+import android.content.Context
 import com.taskmanager.data.database.dao.SubtaskDao
 import com.taskmanager.data.database.dao.TagDao
 import com.taskmanager.data.database.dao.TaskDao
 import com.taskmanager.data.database.entities.*
+import com.taskmanager.notifications.AlarmScheduler
 import kotlinx.coroutines.flow.Flow
 
 class TaskRepository(
     private val taskDao: TaskDao,
     private val subtaskDao: SubtaskDao,
-    private val tagDao: TagDao
+    private val tagDao: TagDao,
+    private val context: Context? = null
 ) {
+    private val alarmScheduler: AlarmScheduler? = context?.let { AlarmScheduler(it) }
     fun getAllTasksWithDetails(): Flow<List<TaskWithDetails>> {
         return taskDao.getAllTasksWithDetails()
     }
@@ -53,6 +57,11 @@ class TaskRepository(
             tagDao.insertTaskTagCrossRef(TaskTagCrossRef(taskId, tagId))
         }
 
+        // Schedule reminder if set
+        task.reminderTime?.let { reminderTime ->
+            alarmScheduler?.scheduleReminder(taskId, task.title, reminderTime)
+        }
+
         return taskId
     }
 
@@ -75,9 +84,17 @@ class TaskRepository(
         tagIds.forEach { tagId ->
             tagDao.insertTaskTagCrossRef(TaskTagCrossRef(task.id, tagId))
         }
+
+        // Update reminder
+        if (task.reminderTime != null) {
+            alarmScheduler?.scheduleReminder(task.id, task.title, task.reminderTime)
+        } else {
+            alarmScheduler?.cancelReminder(task.id)
+        }
     }
 
     suspend fun deleteTask(taskId: Long) {
+        alarmScheduler?.cancelReminder(taskId)
         taskDao.deleteTaskById(taskId)
     }
 

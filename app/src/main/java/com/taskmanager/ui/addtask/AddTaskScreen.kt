@@ -40,8 +40,11 @@ fun AddTaskScreen(
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showReminderDatePicker by remember { mutableStateOf(false) }
+    var showReminderTimePicker by remember { mutableStateOf(false) }
     var showTagDialog by remember { mutableStateOf(false) }
     var newSubtaskText by remember { mutableStateOf("") }
+    var selectedReminderDate by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(taskId) {
         taskId?.let { viewModel.loadTask(it) }
@@ -159,29 +162,40 @@ fun AddTaskScreen(
             }
 
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                OutlinedCard(
+                    onClick = {
+                        if (reminderTime != null) {
+                            showReminderDatePicker = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Reminder", style = MaterialTheme.typography.titleSmall)
-                        Text(
-                            text = reminderTime?.let { DateUtils.formatDateTime(it) } ?: "Not set",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Reminder", style = MaterialTheme.typography.titleSmall)
+                            Text(
+                                text = reminderTime?.let { DateUtils.formatDateTime(it) } ?: "Not set",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = reminderTime != null,
+                            onCheckedChange = {
+                                if (it) {
+                                    showReminderDatePicker = true
+                                } else {
+                                    viewModel.setReminderTime(null)
+                                }
+                            }
                         )
                     }
-                    Switch(
-                        checked = reminderTime != null,
-                        onCheckedChange = {
-                            if (it) {
-                                showTimePicker = true
-                            } else {
-                                viewModel.setReminderTime(null)
-                            }
-                        }
-                    )
                 }
             }
 
@@ -323,6 +337,67 @@ fun AddTaskScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showTimePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
+        if (showReminderDatePicker) {
+            val datePickerState = rememberDatePickerState()
+            DatePickerDialog(
+                onDismissRequest = { showReminderDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let {
+                                selectedReminderDate = it
+                                showReminderDatePicker = false
+                                showReminderTimePicker = true
+                            }
+                        }
+                    ) {
+                        Text("Next")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showReminderDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
+
+        if (showReminderTimePicker) {
+            val timePickerState = rememberTimePickerState()
+            AlertDialog(
+                onDismissRequest = { showReminderTimePicker = false },
+                title = { Text("Set Reminder Time") },
+                text = {
+                    TimePicker(state = timePickerState)
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val baseDate = selectedReminderDate ?: System.currentTimeMillis()
+                            val calendar = Calendar.getInstance().apply {
+                                timeInMillis = baseDate
+                                set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                set(Calendar.MINUTE, timePickerState.minute)
+                                set(Calendar.SECOND, 0)
+                                set(Calendar.MILLISECOND, 0)
+                            }
+                            viewModel.setReminderTime(calendar.timeInMillis)
+                            showReminderTimePicker = false
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showReminderTimePicker = false }) {
                         Text("Cancel")
                     }
                 }

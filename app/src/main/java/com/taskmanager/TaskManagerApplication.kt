@@ -18,7 +18,8 @@ class TaskManagerApplication : Application() {
         TaskRepository(
             database.taskDao(),
             database.subtaskDao(),
-            database.tagDao()
+            database.tagDao(),
+            this
         )
     }
 
