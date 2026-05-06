@@ -106,6 +106,7 @@ fun CalendarScreen(
                 calendarState = calendarState,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .wrapContentHeight()
                     .padding(horizontal = 8.dp),
                 dayContent = { dayState ->
                     val date = dayState.date
