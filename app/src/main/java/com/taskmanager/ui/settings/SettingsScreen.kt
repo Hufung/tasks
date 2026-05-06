@@ -217,15 +217,18 @@ fun SettingsScreen(
                 title = { Text("Select Student Class") },
                 text = {
                     Column(
-                        modifier = Modifier.selectableGroup()
+                        modifier = Modifier
+                            .selectableGroup()
+                            .verticalScroll(rememberScrollState())
+                            .heightIn(max = 400.dp)
                     ) {
                         val classes = listOf(
-                            "1A", "1B", "1C", "1D",
-                            "2A", "2B", "2C", "2D",
-                            "3A", "3B", "3C", "3D",
-                            "4A", "4B", "4C", "4D",
-                            "5A", "5B", "5C", "5D",
-                            "6A", "6B", "6C", "6D"
+                            "1A", "1B", "1C", "1D", "1E",
+                            "2A", "2B", "2C", "2D", "2E",
+                            "3A", "3B", "3C", "3D", "3E",
+                            "4A", "4B", "4C", "4D", "4E",
+                            "5A", "5B", "5C", "5D", "5E",
+                            "6A", "6B", "6C", "6D", "6E"
                         )
                         classes.forEach { className ->
                             Row(
