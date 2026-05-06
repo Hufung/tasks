@@ -201,7 +201,8 @@ fun TaskManagerApp() {
                 val viewModel: TimetableViewModel = viewModel(
                     factory = TimetableViewModelFactory(
                         application.timetableRepository,
-                        application.preferencesRepository
+                        application.preferencesRepository,
+                        application.eventScheduleRepository
                     )
                 )
                 TimetableScreen(viewModel = viewModel)

@@ -28,6 +28,7 @@ fun HomeScreen(
     val filterCompleted by viewModel.filterCompleted.collectAsState()
     val sortBy by viewModel.sortBy.collectAsState()
     val todayCycleDay by viewModel.todayCycleDay.collectAsState()
+    val tomorrowCycleDay by viewModel.tomorrowCycleDay.collectAsState()
 
     var showFilterDialog by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
@@ -38,12 +39,24 @@ fun HomeScreen(
                 title = {
                     Column {
                         Text("My Tasks")
-                        todayCycleDay?.let { cycleDay ->
-                            Text(
-                                text = cycleDay,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            todayCycleDay?.let { cycleDay ->
+                                Text(
+                                    text = "Today: $cycleDay",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            tomorrowCycleDay?.let { cycleDay ->
+                                Text(
+                                    text = "Tomorrow: $cycleDay",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
                     }
                 },

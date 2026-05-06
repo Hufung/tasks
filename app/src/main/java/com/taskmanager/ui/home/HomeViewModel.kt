@@ -38,6 +38,12 @@ class HomeViewModel(
         schedule?.rows?.get(dateString)?.cycleDay
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val tomorrowCycleDay: StateFlow<String?> = _eventSchedule.map { schedule ->
+        val tomorrow = LocalDate.now().plusDays(1)
+        val dateString = DateParser.formatToApiDate(tomorrow)
+        schedule?.rows?.get(dateString)?.cycleDay
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     init {
         loadEventSchedule()
     }

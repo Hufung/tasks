@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,8 +24,31 @@ fun TimetableScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Timetable") },
+                title = {
+                    Column {
+                        Text("Timetable - ${uiState.selectedClass}")
+                        if (uiState.showingTomorrow) {
+                            Text(
+                                text = "Tomorrow: ${uiState.tomorrowCycleDay ?: ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        } else {
+                            Text(
+                                text = "Today: ${uiState.todayCycleDay ?: ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                },
                 actions = {
+                    IconButton(onClick = { viewModel.showTodayTimetable() }) {
+                        Icon(Icons.Default.Today, contentDescription = "Today")
+                    }
+                    IconButton(onClick = { viewModel.showTomorrowTimetable() }) {
+                        Icon(Icons.Default.NavigateNext, contentDescription = "Tomorrow")
+                    }
                     IconButton(onClick = { viewModel.loadTimetable() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
@@ -58,44 +83,6 @@ fun TimetableScreen(
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.padding(16.dp)
                     )
-                }
-            }
-
-            // Class selector
-            if (uiState.availableClasses.isNotEmpty()) {
-                var expandedClass by remember { mutableStateOf(false) }
-
-                ExposedDropdownMenuBox(
-                    expanded = expandedClass,
-                    onExpandedChange = { expandedClass = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = uiState.selectedClass,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Class") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedClass) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandedClass,
-                        onDismissRequest = { expandedClass = false }
-                    ) {
-                        uiState.availableClasses.forEach { className ->
-                            DropdownMenuItem(
-                                text = { Text(className) },
-                                onClick = {
-                                    viewModel.selectClass(className)
-                                    expandedClass = false
-                                }
-                            )
-                        }
-                    }
                 }
             }
 
@@ -149,17 +136,20 @@ fun TimetableScreen(
                                         text = period.subject,
                                         style = MaterialTheme.typography.titleMedium
                                     )
+                                    if (period.venue.isNotBlank()) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Room: ${period.venue}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
-                                Text(
-                                    text = period.venue,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
                             }
                         }
                     }
                 }
-            } else if (!uiState.isLoading && uiState.error == null) {
+            } else if (!uiState.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -167,7 +157,7 @@ fun TimetableScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No timetable data available",
+                        text = "No timetable available for this day",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

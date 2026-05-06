@@ -26,6 +26,20 @@ class SettingsViewModel(
             initialValue = "1A"
         )
 
+    val theme: StateFlow<String> = preferencesRepository.theme
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "system"
+        )
+
+    val selectiveSubjects: StateFlow<String> = preferencesRepository.selectiveSubjects
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ""
+        )
+
     fun setStudentGroup(group: String) {
         viewModelScope.launch {
             preferencesRepository.setStudentGroup(group)
@@ -35,6 +49,18 @@ class SettingsViewModel(
     fun setStudentClass(className: String) {
         viewModelScope.launch {
             preferencesRepository.setStudentClass(className)
+        }
+    }
+
+    fun setTheme(theme: String) {
+        viewModelScope.launch {
+            preferencesRepository.setTheme(theme)
+        }
+    }
+
+    fun setSelectiveSubjects(subjects: String) {
+        viewModelScope.launch {
+            preferencesRepository.setSelectiveSubjects(subjects)
         }
     }
 }
