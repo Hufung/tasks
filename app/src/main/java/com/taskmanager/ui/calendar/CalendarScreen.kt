@@ -130,21 +130,6 @@ fun CalendarScreen(
                             hasEvents = hasEvents && dayState.isFromCurrentMonth
                         )
                     }
-                },
-                weekHeader = { daysOfWeek: List<DayOfWeek> ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        daysOfWeek.forEach { dayOfWeek ->
-                            Text(
-                                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.weight(1f),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-                    }
                 }
             )
 
