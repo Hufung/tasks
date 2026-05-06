@@ -131,7 +131,7 @@ fun CalendarScreen(
                         )
                     }
                 },
-                weekHeader = { daysOfWeek ->
+                weekHeader = @Composable { daysOfWeek: List<DayOfWeek> ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
