@@ -19,9 +19,22 @@ class SettingsViewModel(
             initialValue = "S1"
         )
 
+    val studentClass: StateFlow<String> = preferencesRepository.studentClass
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "1A"
+        )
+
     fun setStudentGroup(group: String) {
         viewModelScope.launch {
             preferencesRepository.setStudentGroup(group)
+        }
+    }
+
+    fun setStudentClass(className: String) {
+        viewModelScope.launch {
+            preferencesRepository.setStudentClass(className)
         }
     }
 }

@@ -27,6 +27,7 @@ fun HomeScreen(
     val selectedTagId by viewModel.selectedTagId.collectAsState()
     val filterCompleted by viewModel.filterCompleted.collectAsState()
     val sortBy by viewModel.sortBy.collectAsState()
+    val todayCycleDay by viewModel.todayCycleDay.collectAsState()
 
     var showFilterDialog by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
@@ -34,7 +35,18 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Tasks") },
+                title = {
+                    Column {
+                        Text("My Tasks")
+                        todayCycleDay?.let { cycleDay ->
+                            Text(
+                                text = cycleDay,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                },
                 actions = {
                     IconButton(onClick = { showSearchBar = !showSearchBar }) {
                         Icon(Icons.Default.Search, contentDescription = "Search")

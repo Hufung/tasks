@@ -37,6 +37,9 @@ import com.taskmanager.ui.taskdetail.TaskDetailScreen
 import com.taskmanager.ui.taskdetail.TaskDetailViewModel
 import com.taskmanager.ui.taskdetail.TaskDetailViewModelFactory
 import com.taskmanager.ui.theme.TaskManagerTheme
+import com.taskmanager.ui.timetable.TimetableScreen
+import com.taskmanager.ui.timetable.TimetableViewModel
+import com.taskmanager.ui.timetable.TimetableViewModelFactory
 import com.taskmanager.utils.DateParser
 import java.time.LocalDate
 
@@ -64,7 +67,7 @@ fun TaskManagerApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = currentRoute in listOf("home", "calendar", "add_task")
+    val showBottomBar = currentRoute in listOf("home", "calendar", "timetable", "add_task")
 
     Scaffold(
         bottomBar = {
@@ -89,7 +92,10 @@ fun TaskManagerApp() {
         ) {
             composable("home") {
                 val viewModel: HomeViewModel = viewModel(
-                    factory = HomeViewModelFactory(application.repository)
+                    factory = HomeViewModelFactory(
+                        application.repository,
+                        application.eventScheduleRepository
+                    )
                 )
                 HomeScreen(
                     viewModel = viewModel,
@@ -189,6 +195,16 @@ fun TaskManagerApp() {
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )
+            }
+
+            composable("timetable") {
+                val viewModel: TimetableViewModel = viewModel(
+                    factory = TimetableViewModelFactory(
+                        application.timetableRepository,
+                        application.preferencesRepository
+                    )
+                )
+                TimetableScreen(viewModel = viewModel)
             }
         }
     }

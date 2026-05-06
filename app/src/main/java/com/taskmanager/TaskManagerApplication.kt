@@ -6,6 +6,7 @@ import com.taskmanager.data.network.NetworkModule
 import com.taskmanager.data.repository.EventScheduleRepository
 import com.taskmanager.data.repository.PreferencesRepository
 import com.taskmanager.data.repository.TaskRepository
+import com.taskmanager.data.repository.TimetableRepository
 import com.taskmanager.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,13 @@ class TaskManagerApplication : Application() {
         EventScheduleRepository(
             NetworkModule.eventScheduleApiService,
             database.eventScheduleCacheDao(),
+            this
+        )
+    }
+
+    val timetableRepository by lazy {
+        TimetableRepository(
+            NetworkModule.eventScheduleApiService,
             this
         )
     }

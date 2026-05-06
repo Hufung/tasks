@@ -4,11 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.taskmanager.data.database.entities.Priority
 import com.taskmanager.data.database.entities.TaskWithDetails
+import com.taskmanager.data.network.models.EventScheduleResponse
+import com.taskmanager.data.repository.EventScheduleRepository
 import com.taskmanager.data.repository.TaskRepository
+import com.taskmanager.utils.DateParser
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-class HomeViewModel(private val repository: TaskRepository) : ViewModel() {
+class HomeViewModel(
+    private val repository: TaskRepository,
+    private val eventScheduleRepository: EventScheduleRepository
+) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -21,6 +28,29 @@ class HomeViewModel(private val repository: TaskRepository) : ViewModel() {
 
     private val _sortBy = MutableStateFlow(SortOption.CREATED_DATE)
     val sortBy: StateFlow<SortOption> = _sortBy.asStateFlow()
+
+    private val _eventSchedule = MutableStateFlow<EventScheduleResponse?>(null)
+    val eventSchedule: StateFlow<EventScheduleResponse?> = _eventSchedule.asStateFlow()
+
+    val todayCycleDay: StateFlow<String?> = _eventSchedule.map { schedule ->
+        val today = LocalDate.now()
+        val dateString = DateParser.formatToApiDate(today)
+        schedule?.rows?.get(dateString)?.cycleDay
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    init {
+        loadEventSchedule()
+    }
+
+    private fun loadEventSchedule() {
+        viewModelScope.launch {
+            eventScheduleRepository.getEventSchedule().collect { result ->
+                result.onSuccess { response ->
+                    _eventSchedule.value = response
+                }
+            }
+        }
+    }
 
     val allTags = repository.getAllTags()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
