@@ -85,14 +85,19 @@ fun SettingsScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Student Class",
+                        text = "Class",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = selectedClass,
+                        text = selectedClass.takeLast(1),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Full class: $selectedClass",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -214,29 +219,23 @@ fun SettingsScreen(
         if (showClassDialog) {
             AlertDialog(
                 onDismissRequest = { showClassDialog = false },
-                title = { Text("Select Student Class") },
+                title = { Text("Select Class") },
                 text = {
                     Column(
-                        modifier = Modifier
-                            .selectableGroup()
-                            .verticalScroll(rememberScrollState())
-                            .heightIn(max = 400.dp)
+                        modifier = Modifier.selectableGroup()
                     ) {
-                        val classes = buildList {
-                            for (year in 1..6) {
-                                for (classLetter in 'A'..'E') {
-                                    add("$year$classLetter")
-                                }
-                            }
-                        }
-                        classes.forEach { className ->
+                        val classLetters = listOf("A", "B", "C", "D", "E")
+                        val currentYear = selectedGroup.removePrefix("S")
+                        val currentClassLetter = selectedClass.takeLast(1)
+
+                        classLetters.forEach { letter ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .selectable(
-                                        selected = (className == selectedClass),
+                                        selected = (letter == currentClassLetter),
                                         onClick = {
-                                            viewModel.setStudentClass(className)
+                                            viewModel.setStudentClass("$currentYear$letter")
                                             showClassDialog = false
                                         },
                                         role = Role.RadioButton
@@ -245,11 +244,11 @@ fun SettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
-                                    selected = (className == selectedClass),
+                                    selected = (letter == currentClassLetter),
                                     onClick = null
                                 )
                                 Text(
-                                    text = className,
+                                    text = "Class $letter ($currentYear$letter)",
                                     style = MaterialTheme.typography.bodyLarge,
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
