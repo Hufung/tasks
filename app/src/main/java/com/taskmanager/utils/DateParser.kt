@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 object DateParser {
-    private val apiDateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy")
+    private val apiDateFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
 
     fun parseApiDate(dateString: String): LocalDate? {
         return try {
